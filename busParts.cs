@@ -515,7 +515,7 @@ namespace IOT.AVREFWebWebsite.Business
                     {
                         cageCode += "%";
                         currentParameter = this.CreateParameter("?CageCode" + conditionCount.ToString(), cageCode);
-                        currentCondition += string.Format(" AND REPLACE(REPLACE(Parts.p_cage, '-', ''), ' ', '') LIKE {0}", currentParameter.ParameterName);
+                        currentCondition += string.Format(" AND Parts.p_cage LIKE {0}", currentParameter.ParameterName);
                         selectParameters.Add(currentParameter);
                     }
 
@@ -718,7 +718,6 @@ namespace IOT.AVREFWebWebsite.Business
 
         public string GetPmaSqlString(string searchVal, bool searchById = false)
         {
-            //string search = exactMatch ? $"=\"{searchVal}\"" : $"LIKE \"%{searchVal}%\"";
             StringBuilder sb = new StringBuilder();
             foreach (char cCurrent in searchVal)
             {
@@ -728,11 +727,9 @@ namespace IOT.AVREFWebWebsite.Business
                 }
             }
             searchVal = sb.ToString();
-
-            // string search = $"LIKE \"%{searchVal}%\"";
-            // string where = $"PartNumber {search} OR ReplacedPartNumber {search}" ;
-            string search = $"LIKE CONCAT('{searchVal}', '%')";
-            string where = $"REPLACE(REPLACE(PartNumber, '-', ''), ' ', '') {search} OR REPLACE(REPLACE(ReplacedPartNumber, '-', ''), ' ', '') {search}";
+            //string search = exactMatch ? $"=\"{searchVal}\"" : $"LIKE \"%{searchVal}%\"";
+            string search = $"LIKE \"%{searchVal}%\"";
+            string where = $"part_number {search} OR replaced_part_number {search}" ;
 
             //this overwrites either of the other two, called when running a report
             if (searchById)
@@ -741,7 +738,9 @@ namespace IOT.AVREFWebWebsite.Business
             }
 
             var retVal = $@"SELECT Holder, PMANumber, Address, City, State, ZIP, Country, ResponsibleOfficeID as Office, SupNumber, 
-                            SupDate, PartNumber, PartName, ReplacedPartNumber, ApprovalBasis, Models , PartId
+                            SupDate, PartNumber, PartName, ReplacedPartNumber, ApprovalBasis, Models, PartId, 
+                            REPLACE(REPLACE(PartNumber, '-', ''), ' ', '') as part_number,
+                            REPLACE(REPLACE(ReplacedPartNumber, '-', ''), ' ', '') as replaced_part_number 
                                                         FROM pmaparts
                                                         WHERE {where}
                                                         LIMIT {this.FetchSize}";

@@ -29,6 +29,7 @@ namespace IOT.AVREFWebWebsite.Business
                                                     MCRL.msds, 
                                                     MCRL.niin, 
                                                     MCRL.ref_numb, 
+                                                    MCRL.ref_numb_no_dash, 
                                                     MCRL.rncc, 
                                                     MCRL.rnvc, 
                                                     MCRL.sadc, 
@@ -78,6 +79,7 @@ namespace IOT.AVREFWebWebsite.Business
                                                     null as msds, 
                                                     MDIS.niin, 
                                                     null as ref_numb, 
+                                                    null as ref_numb_no_dash, 
                                                     null as rncc, 
                                                     null as rnvc, 
                                                     null as sadc, 
@@ -128,6 +130,7 @@ namespace IOT.AVREFWebWebsite.Business
                                                     null as msds, 
                                                     null as niin, 
                                                     null as ref_numb, 
+                                                    null as ref_numb_no_dash, 
                                                     null as rncc, 
                                                     null as rnvc, 
                                                     null as sadc, 
@@ -167,6 +170,7 @@ namespace IOT.AVREFWebWebsite.Business
                                                     null as msds, 
                                                     CharGov.niin, 
                                                     null as ref_numb, 
+                                                    null as ref_numb_no_dash, 
                                                     null as rncc, 
                                                     null as rnvc, 
                                                     null as sadc, 
@@ -278,15 +282,15 @@ namespace IOT.AVREFWebWebsite.Business
         {
             bool retVal = false;
             string fsc = "", niin = "";
-            StringBuilder sb = new StringBuilder();
-            foreach (char cCurrent in strNSN)
-            {
-                if (char.IsLetterOrDigit(cCurrent))
-                {
-                    sb.Append(cCurrent);
-                }
-            }
-            strNSN = sb.ToString();
+            // StringBuilder sb = new StringBuilder();
+            // foreach (char cCurrent in strNSN)
+            // {
+            //     if (char.IsLetterOrDigit(cCurrent))
+            //     {
+            //         sb.Append(cCurrent);
+            //     }
+            // }
+            // strNSN = sb.ToString();
 
             if (strNSN.Length > 4)
             {
@@ -325,15 +329,15 @@ namespace IOT.AVREFWebWebsite.Business
             bool retVal = false;
             string fsc = "", niin = "";
 
-            StringBuilder sb = new StringBuilder();
-            foreach (char cCurrent in strNSN)
-            {
-                if (char.IsLetterOrDigit(cCurrent))
-                {
-                    sb.Append(cCurrent);
-                }
-            }
-            strNSN = sb.ToString();
+            // StringBuilder sb = new StringBuilder();
+            // foreach (char cCurrent in strNSN)
+            // {
+            //     if (char.IsLetterOrDigit(cCurrent))
+            //     {
+            //         sb.Append(cCurrent);
+            //     }
+            // }
+            // strNSN = sb.ToString();
 
             if (strNSN.Length > 4)
             {
@@ -373,15 +377,15 @@ namespace IOT.AVREFWebWebsite.Business
             bool retVal = false;
             string fsc = "", niin = "";
 
-            StringBuilder sb = new StringBuilder();
-            foreach (char cCurrent in strNSN)
-            {
-                if (char.IsLetterOrDigit(cCurrent))
-                {
-                    sb.Append(cCurrent);
-                }
-            }
-            strNSN = sb.ToString();
+            // StringBuilder sb = new StringBuilder();
+            // foreach (char cCurrent in strNSN)
+            // {
+            //     if (char.IsLetterOrDigit(cCurrent))
+            //     {
+            //         sb.Append(cCurrent);
+            //     }
+            // }
+            // strNSN = sb.ToString();
 
             if (strNSN.Length > 4)
             {
@@ -419,25 +423,25 @@ namespace IOT.AVREFWebWebsite.Business
 
         public bool LoadByNSNAndCage(string strNSN, string strCage, string strTableName)
         {
-            StringBuilder sb = new StringBuilder();
-            foreach (char cCurrent in strNSN)
-            {
-                if (char.IsLetterOrDigit(cCurrent))
-                {
-                    sb.Append(cCurrent);
-                }
-            }
-            strNSN = sb.ToString();
+            // StringBuilder sb = new StringBuilder();
+            // foreach (char cCurrent in strNSN)
+            // {
+            //     if (char.IsLetterOrDigit(cCurrent))
+            //     {
+            //         sb.Append(cCurrent);
+            //     }
+            // }
+            // strNSN = sb.ToString();
 
-            StringBuilder sb2 = new StringBuilder();
-            foreach (char cCurrent in strCage)
-            {
-                if (char.IsLetterOrDigit(cCurrent))
-                {
-                    sb2.Append(cCurrent);
-                }
-            }
-            strCage = sb2.ToString();
+            // StringBuilder sb2 = new StringBuilder();
+            // foreach (char cCurrent in strCage)
+            // {
+            //     if (char.IsLetterOrDigit(cCurrent))
+            //     {
+            //         sb2.Append(cCurrent);
+            //     }
+            // }
+            // strCage = sb2.ToString();
 
             bool retVal = false;
             string fsc = "", niin = "";
@@ -478,15 +482,15 @@ namespace IOT.AVREFWebWebsite.Business
         {
             bool retVal = false;
 
-            StringBuilder sb = new StringBuilder();
-            foreach (char cCurrent in strNSN)
-            {
-                if (char.IsLetterOrDigit(cCurrent))
-                {
-                    sb.Append(cCurrent);
-                }
-            }
-            strNSN = sb.ToString();
+            // StringBuilder sb = new StringBuilder();
+            // foreach (char cCurrent in strNSN)
+            // {
+            //     if (char.IsLetterOrDigit(cCurrent))
+            //     {
+            //         sb.Append(cCurrent);
+            //     }
+            // }
+            // strNSN = sb.ToString();
 
             IDbCommand Command = this.CreateCommand(string.Format(@"SELECT {0} 
                                                       FROM {1}                 
@@ -514,15 +518,15 @@ namespace IOT.AVREFWebWebsite.Business
         public bool LoadCHARByNSN(string strNSN, string strTableName)
         {
             bool retVal = false;
-            StringBuilder sb = new StringBuilder();
-            foreach (char cCurrent in strNSN)
-            {
-                if (char.IsLetterOrDigit(cCurrent))
-                {
-                    sb.Append(cCurrent);
-                }
-            }
-            strNSN = sb.ToString();
+            // StringBuilder sb = new StringBuilder();
+            // foreach (char cCurrent in strNSN)
+            // {
+            //     if (char.IsLetterOrDigit(cCurrent))
+            //     {
+            //         sb.Append(cCurrent);
+            //     }
+            // }
+            // strNSN = sb.ToString();
 
             string fsc = "", niin = "";
             if (strNSN.Length > 4)
@@ -685,14 +689,14 @@ namespace IOT.AVREFWebWebsite.Business
             switch (typeOfSearch)
             {
                 case SearchTypes.NSN:
-                    // fieldExpression = "MCRL.fsc";
-                    // fieldExpression2 = "MCRL.niin";
-                    fieldExpression = "REPLACE(REPLACE(MCRL.fsc, '-', ''), ' ', '')";
-                    fieldExpression2 = "REPLACE(REPLACE(MCRL.niin, '-', ''), ' ', '')";
+                    fieldExpression = "MCRL.fsc";
+                    fieldExpression2 = "MCRL.niin";
+                    // fieldExpression = "REPLACE(REPLACE(MCRL.fsc, '-', ''), ' ', '')";
+                    // fieldExpression2 = "REPLACE(REPLACE(MCRL.niin, '-', ''), ' ', '')";
 
                     //fieldExpression3 = "MCRL.can_nsn";
                     //valueToFind3 = valueToFind;
-                    valueToFind = valueToFind.Replace("-", String.Empty);
+                    // valueToFind = valueToFind.Replace("-", String.Empty);
                     if (valueToFind.Length > 4)
                     {
                         valueToFind2 = valueToFind.Substring(4);
@@ -700,8 +704,8 @@ namespace IOT.AVREFWebWebsite.Business
                     }
                     break;
                 case SearchTypes.CAGE:
-                    // fieldExpression = "MCRL.Cage_cd_92";
-                    fieldExpression = "REPLACE(REPLACE(MCRL.Cage_cd_92, '-', ''), ' ', '')";
+                    fieldExpression = "MCRL.Cage_cd_92";
+                    // fieldExpression = "REPLACE(REPLACE(MCRL.Cage_cd_92, '-', ''), ' ', '')";
                     break;
 
                 case SearchTypes.Description:
@@ -713,27 +717,27 @@ namespace IOT.AVREFWebWebsite.Business
                     //08-09-2009: Always removing hyphens unless exact match (still leaving it as a parameter incase mind is changed)
                     if (!exactMatch || removeHyphens)
                     {
-                        // fieldExpression = "MCRL.ref_numb_no_dash";
-                        fieldExpression = "REPLACE(REPLACE(MCRL.ref_numb_no_dash, '-', ''), ' ', '')";
+                        fieldExpression = "MCRL.ref_numb_no_dash";
+                        // fieldExpression = "REPLACE(REPLACE(MCRL.ref_numb_no_dash, '-', ''), ' ', '')";
 
-                        foreach (char cCurrent in valueToFind)
-                        {
-                            if (!char.IsLetterOrDigit(cCurrent))
-                                valueToFind = valueToFind.Replace(cCurrent.ToString(), String.Empty).Trim();
-                        }
+                        // foreach (char cCurrent in valueToFind)
+                        // {
+                        //     if (!char.IsLetterOrDigit(cCurrent))
+                        //         valueToFind = valueToFind.Replace(cCurrent.ToString(), String.Empty).Trim();
+                        // }
 
                         //valueToFind = valueToFind.Replace("-", "");
                     }
                     else
-                        // fieldExpression = "MCRL.ref_numb";
-                        fieldExpression = "REPLACE(REPLACE(MCRL.ref_numb, '-', ''), ' ', '')";
+                        fieldExpression = "MCRL.ref_numb";
+                        // fieldExpression = "REPLACE(REPLACE(MCRL.ref_numb, '-', ''), ' ', '')";
 
                     break;
             }
 
 
-            valueToFind = valueToFind.Trim();
-            valueToFind2 = valueToFind2.Trim();
+            // valueToFind = valueToFind.Trim();
+            // valueToFind2 = valueToFind2.Trim();
             //valueToFind3 = valueToFind3.Trim();
 
             if (exactMatch)
@@ -812,10 +816,10 @@ namespace IOT.AVREFWebWebsite.Business
                 if (typeOfSearch == SearchTypes.NSN)
                 {
                     this.eEnhancedSearchResultsType = EnumEnhancedSearchResultsType.MDIS;
-                    // fieldExpression = "MDIS.fsc";
-                    // fieldExpression2 = "MDIS.niin";
-                    fieldExpression = "REPLACE(REPLACE(MDIS.fsc, '-', ''), ' ', '')";
-                    fieldExpression2 = "REPLACE(REPLACE(MDIS.niin, '-', ''), ' ', '')";
+                    fieldExpression = "MDIS.fsc";
+                    fieldExpression2 = "MDIS.niin";
+                    // fieldExpression = "REPLACE(REPLACE(MDIS.fsc, '-', ''), ' ', '')";
+                    // fieldExpression2 = "REPLACE(REPLACE(MDIS.niin, '-', ''), ' ', '')";
 
                     whereClause = string.Format("{0} {1} ?valueToFind", fieldExpression, comparisonOperator);
 
@@ -842,10 +846,10 @@ namespace IOT.AVREFWebWebsite.Business
                     {
                         //CharGov Table Where Clause
                         this.eEnhancedSearchResultsType = EnumEnhancedSearchResultsType.CHAR;
-                        // fieldExpression = "CharGov.fsc";
-                        // fieldExpression2 = "CharGov.niin";
-                        fieldExpression = "REPLACE(REPLACE(CharGov.fsc, '-', ''), ' ', '')";
-                        fieldExpression2 = "REPLACE(REPLACE(CharGov.niin, '-', ''), ' ', '')";
+                        fieldExpression = "CharGov.fsc";
+                        fieldExpression2 = "CharGov.niin";
+                        // fieldExpression = "REPLACE(REPLACE(CharGov.fsc, '-', ''), ' ', '')";
+                        // fieldExpression2 = "REPLACE(REPLACE(CharGov.niin, '-', ''), ' ', '')";
 
                         whereClause = string.Format("{0} {1} ?valueToFind", fieldExpression, comparisonOperator);
 
@@ -871,8 +875,8 @@ namespace IOT.AVREFWebWebsite.Business
                         {
                             //CHF Table Where Clause
                             this.eEnhancedSearchResultsType = EnumEnhancedSearchResultsType.CHF;
-                            // fieldExpression = "CHF.NSN";
-                            fieldExpression = "REPLACE(REPLACE(CHF.NSN, '-', ''), ' ', '')";
+                            fieldExpression = "CHF.NSN";
+                            // fieldExpression = "REPLACE(REPLACE(CHF.NSN, '-', ''), ' ', '')";
 
                             whereClause = string.Format("{0} {1} ?valueToFind", fieldExpression, comparisonOperator);
 

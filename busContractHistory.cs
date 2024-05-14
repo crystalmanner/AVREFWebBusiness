@@ -86,13 +86,12 @@ namespace IOT.AVREFWebWebsite.Business
                 }
             }
             strNSN = sb.ToString();
-
-            string search = $"LIKE CONCAT('{strNSN}', '%')";
+            strNSN += "%";
             IDbCommand Command = this.CreateCommand(string.Format(@"SELECT {0} 
                                                       FROM CHF 
-                                                        WHERE REPLACE(REPLACE(CHF.nsn, '-', ''), ' ', '') ?NSN 
+                                                        WHERE REPLACE(REPLACE(CHF.nsn, '-', ''), ' ', '') LIKE ?NSN
                                                         ORDER BY CHF.date, CHF.contract", this.SelectFieldsWithUserPreferences(this.Username)));
-            Command.Parameters.Add(this.CreateParameter("?NSN", search));
+            Command.Parameters.Add(this.CreateParameter("?NSN", strNSN));
 
             if (this.ExecuteWithErrorLog(Command, strTableName) < 1)
                 this.SetError("Contract History not found.");
@@ -121,13 +120,13 @@ namespace IOT.AVREFWebWebsite.Business
                 }
             }
             strPartNumber = sb.ToString();
+            strPartNumber += "%";
 
-            string search = $"LIKE CONCAT('{strPartNumber}', '%')";
             IDbCommand Command = this.CreateCommand(string.Format(@"SELECT {0} 
                                                       FROM CHF 
-                                                        WHERE REPLACE(REPLACE(CHF.ref_numb, '-', ''), ' ', '') ?PartNumber 
+                                                        WHERE CHF.ref_numb_no_dash LIKE ?PartNumber
                                                         ORDER BY CHF.date, CHF.contract", this.SelectFieldsWithUserPreferences(this.Username)));
-            Command.Parameters.Add(this.CreateParameter("?PartNumber", search));
+            Command.Parameters.Add(this.CreateParameter("?PartNumber", strPartNumber));
 
             if (this.ExecuteWithErrorLog(Command, strTableName) < 1)
                 this.SetError("Contract History not found.");
@@ -155,9 +154,12 @@ namespace IOT.AVREFWebWebsite.Business
         /// </summary>
         /// <param name="valueToFind">The nsn to search for.</param>
         /// <returns>True if one or more results are found</returns>
-        public bool SearchContracts(SearchTypes searchType, string valueToFind, bool exactMatch = false)
+        public bool SearchContracts(SearchTypes searchType, string valueToFind, bool exactMatch)
         {
+            string whereClause = String.Empty;
+            string fieldExpression;
             exactMatch = false;
+            
             StringBuilder sb = new StringBuilder();
             foreach (char cCurrent in valueToFind)
             {
@@ -168,13 +170,11 @@ namespace IOT.AVREFWebWebsite.Business
             }
             valueToFind = sb.ToString();
 
-            string whereClause = String.Empty;
-            string fieldExpression;
-
             switch (searchType)
             {
                 case SearchTypes.PartNum:
-                    fieldExpression = "REPLACE(REPLACE(CHF.ref_numb_no_dash, '-', ''), ' ', '')";
+                    fieldExpression="CHF.ref_numb_no_dash";
+                    // fieldExpression = "REPLACE(REPLACE(CHF.ref_numb_no_dash, '-', ''), ' ', '')";
                     break;
 
                 case SearchTypes.NSN:
@@ -182,11 +182,8 @@ namespace IOT.AVREFWebWebsite.Business
                     fieldExpression = "REPLACE(REPLACE(CHF.NSN, '-', ''), ' ', '')";
                     break;
             }
-
+                         
             string comparisonOperator;
-
-            valueToFind = valueToFind.Replace("-", String.Empty);
-            valueToFind = valueToFind.Trim();
 
             if (exactMatch)
             {
@@ -248,7 +245,7 @@ namespace IOT.AVREFWebWebsite.Business
             if ((sbyte)oUserPrefs.DataRow["CurrencyJustification"] == 1)
                 formatExpression = "CAST(CONCAT('" + oUserPrefs.DataRow["CurrencySymbol"].ToString().Replace("'", @"\'") + "'," + formatExpression + ") as char(30))";
             else
-                formatExpression = "CAST(CONCAT(" + formatExpression + ",'" + oUserPrefs.DataRow["CurrencySymbol"].ToString().Replace("'", @"\'") + "') as char(30))";
+				formatExpression = "CAST(CONCAT(" + formatExpression + ",'" + oUserPrefs.DataRow["CurrencySymbol"].ToString().Replace("'", @"\'") + "') as char(30))";
 
             selectFields += "," + string.Format(formatExpression, "CHF.unit_price") + " as formatted_unit_price";
             selectFields += "," + string.Format(formatExpression, "CHF.total") + " as formatted_total";
