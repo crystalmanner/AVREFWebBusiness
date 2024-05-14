@@ -727,24 +727,24 @@ namespace IOT.AVREFWebWebsite.Business
                 }
             }
             searchVal = sb.ToString();
-            //string search = exactMatch ? $"=\"{searchVal}\"" : $"LIKE \"%{searchVal}%\"";
-            string search = $"LIKE \"%{searchVal}%\"";
-            string where = $"part_number {search} OR replaced_part_number {search}" ;
 
-            //this overwrites either of the other two, called when running a report
+            string where;
             if (searchById)
             {
-                where = $"PartId =\"{searchVal}\"";
+                where = "PartId = @searchVal";
+            }
+            else
+            {
+                string searchPattern = $"%{searchVal}%";
+                where = $"REPLACE(REPLACE(PartNumber, '-', ''), ' ', '') LIKE @searchPattern OR REPLACE(REPLACE(ReplacedPartNumber, '-', ''), ' ', '') LIKE @searchPattern";
             }
 
-            var retVal = $@"SELECT Holder, PMANumber, Address, City, State, ZIP, Country, ResponsibleOfficeID as Office, SupNumber, 
-                            SupDate, PartNumber, PartName, ReplacedPartNumber, ApprovalBasis, Models, PartId, 
-                            REPLACE(REPLACE(PartNumber, '-', ''), ' ', '') as part_number,
-                            REPLACE(REPLACE(ReplacedPartNumber, '-', ''), ' ', '') as replaced_part_number 
-                                                        FROM pmaparts
-                                                        WHERE {where}
-                                                        LIMIT {this.FetchSize}";
-            return retVal;
+            string sql = $@"SELECT Holder, PMANumber, Address, City, State, ZIP, Country, ResponsibleOfficeID as Office, SupNumber, 
+                            SupDate, PartNumber, PartName, ReplacedPartNumber, ApprovalBasis, Models, PartId 
+                            FROM pmaparts 
+                            WHERE {where} 
+                            LIMIT {this.FetchSize}";
+            return sql;
         }
         #endregion
 

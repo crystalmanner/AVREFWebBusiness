@@ -667,8 +667,7 @@ namespace IOT.AVREFWebWebsite.Business
         public bool SearchMCRL(string valueToFind, SearchTypes typeOfSearch, bool exactMatch = false, bool removeHyphens = true)
         {
             string whereClause = String.Empty;
-            string fieldExpression, fieldExpression2 = "";
-            string valueToFind2 = "";
+            string fieldExpression;
             string comparisonOperator;
             string strNSNPartResults = String.Empty;
             string strOriginalResultsOrder = String.Empty;
@@ -689,23 +688,10 @@ namespace IOT.AVREFWebWebsite.Business
             switch (typeOfSearch)
             {
                 case SearchTypes.NSN:
-                    fieldExpression = "MCRL.fsc";
-                    fieldExpression2 = "MCRL.niin";
-                    // fieldExpression = "REPLACE(REPLACE(MCRL.fsc, '-', ''), ' ', '')";
-                    // fieldExpression2 = "REPLACE(REPLACE(MCRL.niin, '-', ''), ' ', '')";
-
-                    //fieldExpression3 = "MCRL.can_nsn";
-                    //valueToFind3 = valueToFind;
-                    // valueToFind = valueToFind.Replace("-", String.Empty);
-                    if (valueToFind.Length > 4)
-                    {
-                        valueToFind2 = valueToFind.Substring(4);
-                        valueToFind = valueToFind.Substring(0, 4);
-                    }
+                    fieldExpression = "MCRL.nsn";
                     break;
                 case SearchTypes.CAGE:
                     fieldExpression = "MCRL.Cage_cd_92";
-                    // fieldExpression = "REPLACE(REPLACE(MCRL.Cage_cd_92, '-', ''), ' ', '')";
                     break;
 
                 case SearchTypes.Description:
@@ -718,27 +704,11 @@ namespace IOT.AVREFWebWebsite.Business
                     if (!exactMatch || removeHyphens)
                     {
                         fieldExpression = "MCRL.ref_numb_no_dash";
-                        // fieldExpression = "REPLACE(REPLACE(MCRL.ref_numb_no_dash, '-', ''), ' ', '')";
-
-                        // foreach (char cCurrent in valueToFind)
-                        // {
-                        //     if (!char.IsLetterOrDigit(cCurrent))
-                        //         valueToFind = valueToFind.Replace(cCurrent.ToString(), String.Empty).Trim();
-                        // }
-
-                        //valueToFind = valueToFind.Replace("-", "");
                     }
                     else
                         fieldExpression = "MCRL.ref_numb";
-                        // fieldExpression = "REPLACE(REPLACE(MCRL.ref_numb, '-', ''), ' ', '')";
-
                     break;
             }
-
-
-            // valueToFind = valueToFind.Trim();
-            // valueToFind2 = valueToFind2.Trim();
-            //valueToFind3 = valueToFind3.Trim();
 
             if (exactMatch)
             {
@@ -747,25 +717,18 @@ namespace IOT.AVREFWebWebsite.Business
             else
             {
                 comparisonOperator = "LIKE";
-                if (valueToFind2.Equals(string.Empty))
-                {
-                    if (typeOfSearch == SearchTypes.Description)
-                    {
-                        if (!string.IsNullOrEmpty(valueToFind))
-                        {
-                            var individualWords = valueToFind.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-                            valueToFind = "+" + string.Join("* +", individualWords) + "*";
-                        }
+                if (typeOfSearch == SearchTypes.Description)
+                {
+                    if (!string.IsNullOrEmpty(valueToFind))
+                    {
+                        var individualWords = valueToFind.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                        valueToFind = "+" + string.Join("* +", individualWords) + "*";
                     }
-                    else
-                        valueToFind += "%";
                 }
                 else
-                    valueToFind2 += "%";
-
-                //if(!valueToFind3.Equals(String.Empty))
-                //    valueToFind3 += "%";
+                    valueToFind += "%";
             }
 
             if (typeOfSearch == SearchTypes.Description && !exactMatch)
@@ -773,15 +736,10 @@ namespace IOT.AVREFWebWebsite.Business
             else
                 whereClause += string.Format("{0} {1} ?valueToFind", fieldExpression, comparisonOperator);
 
-            if (!valueToFind2.Equals(string.Empty))
-                whereClause += string.Format(" AND {0} {1} ?valueToFind2", fieldExpression2, comparisonOperator);
-
-            //if (!valueToFind3.Equals(string.Empty))
-            //    whereClause += string.Format(" OR {0} {1} ?valueToFind3", fieldExpression3, comparisonOperator);
-
             IDbCommand Command;
             var codeFields = "NsnExportCodes.SchbCode";
-            var codeJoin = "LEFT JOIN NsnExportCodes ON NsnExportCodes.P_NSN = CONCAT(MCRL.fsc,MCRL.NIIN)";
+            // var codeJoin = "LEFT JOIN NsnExportCodes ON NsnExportCodes.P_NSN = CONCAT(MCRL.fsc,MCRL.NIIN)";
+            var codeJoin = "LEFT JOIN NsnExportCodes ON NsnExportCodes.P_NSN = MCRL.nsn";
             if (typeOfSearch != SearchTypes.PartNum)
             {
                 Command = this.CreateCommand(string.Format(@"SELECT {0}
@@ -794,7 +752,8 @@ namespace IOT.AVREFWebWebsite.Business
             }
             else
             {
-                Command = this.CreateCommand(string.Format(@"SELECT MCRL.iPrimary,CONCAT(MCRL.fsc,MCRL.NIIN) as NSN
+                // Command = this.CreateCommand(string.Format(@"SELECT MCRL.iPrimary,CONCAT(MCRL.fsc,MCRL.NIIN) as NSN
+                Command = this.CreateCommand(string.Format(@"SELECT MCRL.iPrimary, MCRL.nsn as NSN
                                                                     FROM {1}
                                                                     WHERE {2} LIMIT {3}",
                                                                     $"{this.SelectFieldsWithUserPreferences(this.Username)}, {codeFields}",
@@ -804,11 +763,6 @@ namespace IOT.AVREFWebWebsite.Business
             }
 
             Command.Parameters.Add(this.CreateParameter("?valueToFind", valueToFind));
-            if (!valueToFind2.Equals(string.Empty))
-                Command.Parameters.Add(this.CreateParameter("?valueToFind2", valueToFind2));
-            //if (!valueToFind3.Equals(string.Empty))
-            //    Command.Parameters.Add(this.CreateParameter("?valueToFind3", valueToFind3));
-
             Command.Prepare();
 
             if (this.ExecuteWithErrorLog(Command, this.Tablename) < 1)
@@ -816,15 +770,9 @@ namespace IOT.AVREFWebWebsite.Business
                 if (typeOfSearch == SearchTypes.NSN)
                 {
                     this.eEnhancedSearchResultsType = EnumEnhancedSearchResultsType.MDIS;
-                    fieldExpression = "MDIS.fsc";
-                    fieldExpression2 = "MDIS.niin";
-                    // fieldExpression = "REPLACE(REPLACE(MDIS.fsc, '-', ''), ' ', '')";
-                    // fieldExpression2 = "REPLACE(REPLACE(MDIS.niin, '-', ''), ' ', '')";
+                    fieldExpression = "MDIS.nsn";
 
                     whereClause = string.Format("{0} {1} ?valueToFind", fieldExpression, comparisonOperator);
-
-                    if (!valueToFind2.Equals(string.Empty))
-                        whereClause += string.Format(" AND {0} {1} ?valueToFind2", fieldExpression2, comparisonOperator);
 
                     //Try to search MDIS First, Then CHF THEN Char
                     Command = this.CreateCommand(string.Format(@"SELECT {0}
@@ -837,24 +785,15 @@ namespace IOT.AVREFWebWebsite.Business
                                                                  this.FetchSize.ToString()));
 
                     Command.Parameters.Add(this.CreateParameter("?valueToFind", valueToFind));
-                    if (!valueToFind2.Equals(string.Empty))
-                        Command.Parameters.Add(this.CreateParameter("?valueToFind2", valueToFind2));
-
                     Command.Prepare();
 
                     if (this.ExecuteWithErrorLog(Command, this.Tablename) < 1)
                     {
                         //CharGov Table Where Clause
                         this.eEnhancedSearchResultsType = EnumEnhancedSearchResultsType.CHAR;
-                        fieldExpression = "CharGov.fsc";
-                        fieldExpression2 = "CharGov.niin";
-                        // fieldExpression = "REPLACE(REPLACE(CharGov.fsc, '-', ''), ' ', '')";
-                        // fieldExpression2 = "REPLACE(REPLACE(CharGov.niin, '-', ''), ' ', '')";
+                        fieldExpression = "CharGov.nsn";
 
                         whereClause = string.Format("{0} {1} ?valueToFind", fieldExpression, comparisonOperator);
-
-                        if (!valueToFind2.Equals(string.Empty))
-                            whereClause += string.Format(" AND {0} {1} ?valueToFind2", fieldExpression2, comparisonOperator);
 
                         Command = this.CreateCommand(string.Format(@"SELECT {0}
                                                                      FROM {1}
@@ -866,8 +805,6 @@ namespace IOT.AVREFWebWebsite.Business
                                                                      this.FetchSize.ToString()));
 
                         Command.Parameters.Add(this.CreateParameter("?valueToFind", valueToFind));
-                        if (!valueToFind2.Equals(string.Empty))
-                            Command.Parameters.Add(this.CreateParameter("?valueToFind2", valueToFind2));
 
                         Command.Prepare();
 
@@ -890,7 +827,7 @@ namespace IOT.AVREFWebWebsite.Business
                                                                      this.FetchSize.ToString()));
 
 
-                            Command.Parameters.Add(this.CreateParameter("?valueToFind", valueToFind + valueToFind2));
+                            Command.Parameters.Add(this.CreateParameter("?valueToFind", valueToFind));
 
                             Command.Prepare();
 
