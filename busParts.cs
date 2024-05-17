@@ -716,8 +716,9 @@ namespace IOT.AVREFWebWebsite.Business
             return this.ExecuteWithErrorLog(GetPmaSqlString(partId, true), "PMAIdInfo") > 0;
         }
 
-        public string GetPmaSqlString(string searchVal, bool searchById = false)
+        public string GetPmaSqlString(string searchVal,  bool searchById = false)
         {
+            //string search = exactMatch ? $"=\"{searchVal}\"" : $"LIKE \"%{searchVal}%\"";
             StringBuilder sb = new StringBuilder();
             foreach (char cCurrent in searchVal)
             {
@@ -727,24 +728,22 @@ namespace IOT.AVREFWebWebsite.Business
                 }
             }
             searchVal = sb.ToString();
+            
+            string search = $"LIKE \"%{searchVal}%\"";
+            string where = $"PartNumber {search} OR ReplacedPartNumber {search}" ;
 
-            string where;
+            //this overwrites either of the other two, called when running a report
             if (searchById)
             {
-                where = "PartId = @searchVal";
-            }
-            else
-            {
-                string searchPattern = $"%{searchVal}%";
-                where = $"REPLACE(REPLACE(PartNumber, '-', ''), ' ', '') LIKE @searchPattern OR REPLACE(REPLACE(ReplacedPartNumber, '-', ''), ' ', '') LIKE @searchPattern";
+                where = $"PartId =\"{searchVal}\"";
             }
 
-            string sql = $@"SELECT Holder, PMANumber, Address, City, State, ZIP, Country, ResponsibleOfficeID as Office, SupNumber, 
-                            SupDate, PartNumber, PartName, ReplacedPartNumber, ApprovalBasis, Models, PartId 
-                            FROM pmaparts 
-                            WHERE {where} 
-                            LIMIT {this.FetchSize}";
-            return sql;
+            var retVal = $@"SELECT Holder, PMANumber, Address, City, State, ZIP, Country, ResponsibleOfficeID as Office, SupNumber, 
+                            SupDate, PartNumber, PartName, ReplacedPartNumber, ApprovalBasis, Models , PartId
+                                                        FROM pmaparts
+                                                        WHERE {where}
+                                                        LIMIT {this.FetchSize}";
+            return retVal;
         }
         #endregion
 

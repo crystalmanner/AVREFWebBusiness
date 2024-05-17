@@ -14,7 +14,7 @@ namespace IOT.AVREFWebWebsite.Business
         #region Constants
         public const string MDISInformationMessage = "No Results Found In MCRL, Below Are The Results For MDIS Records";
         public const string CHFInformationMessage = "No Results Found In MCRL or MDIS, Below Are The Results For CHF Records";
-        public const string CHARInformationMessage = "No Results Found In MCRL, MDIS, or CHF, Below Are The Results For CHAR Records";
+        // public const string CHARInformationMessage = "No Results Found In MCRL, MDIS, or CHF, Below Are The Results For CHAR Records";
         public const string StandardFieldList = @"MCRL.cage_cd_92, 
                                                     MCRL.can_nsn, 
                                                     MCRL.dup_da, 
@@ -35,7 +35,7 @@ namespace IOT.AVREFWebWebsite.Business
                                                     MCRL.sadc, 
                                                     MCRL.tLastUpdt, 
                                                     MCRL.iPrimary, 
-                                                    CONCAT(MCRL.fsc,MCRL.NIIN) as NSN,
+                                                    MCRL.nsn, 
                                                     MDIS.pmic, 
                                                     MDIS.critcl_cd, 
                                                     MDIS.adp, 
@@ -85,7 +85,7 @@ namespace IOT.AVREFWebWebsite.Business
                                                     null as sadc, 
                                                     null as tLastUpdt, 
                                                     null as iPrimary, 
-                                                    CONCAT(MDIS.fsc,MDIS.NIIN) as NSN, 
+                                                    MDIS.nsn, 
                                                     MDIS.pmic, 
                                                     MDIS.critcl_cd, 
                                                     MDIS.adp, 
@@ -176,7 +176,7 @@ namespace IOT.AVREFWebWebsite.Business
                                                     null as sadc, 
                                                     null as tLastUpdt, 
                                                     null as iPrimary, 
-                                                    CONCAT(CharGov.fsc,CharGov.NIIN) as NSN, 
+                                                    CharGov.nsn, 
                                                     null as pmic, 
                                                     null as critcl_cd, 
                                                     null as adp, 
@@ -281,30 +281,10 @@ namespace IOT.AVREFWebWebsite.Business
         public bool LoadByNSN(string strNSN, string strTableName)
         {
             bool retVal = false;
-            string fsc = "", niin = "";
-            // StringBuilder sb = new StringBuilder();
-            // foreach (char cCurrent in strNSN)
-            // {
-            //     if (char.IsLetterOrDigit(cCurrent))
-            //     {
-            //         sb.Append(cCurrent);
-            //     }
-            // }
-            // strNSN = sb.ToString();
-
-            if (strNSN.Length > 4)
-            {
-                fsc = strNSN.Substring(0, 4);
-                niin = strNSN.Substring(4);
-            }
-            else
-                fsc = strNSN;
-
             IDbCommand Command = this.CreateCommand(string.Format(@"SELECT {0} 
                                                       FROM {1}                 
-                                                      WHERE MCRL.fsc=?FSC AND MCRL.niin=?NIIN AND MCRL.tLastUpdt is not NULL", this.SelectFieldsWithUserPreferences(this.Username), busNSN.StandardFromClause));
-            Command.Parameters.Add(this.CreateParameter("?FSC", fsc));
-            Command.Parameters.Add(this.CreateParameter("?NIIN", niin));
+                                                      WHERE MCRL.nsn=?NSN AND MCRL.tLastUpdt is not NULL", this.SelectFieldsWithUserPreferences(this.Username), busNSN.StandardFromClause));
+            Command.Parameters.Add(this.CreateParameter("?NSN", strNSN));
 
             if (this.ExecuteWithErrorLog(Command, strTableName) < 1)
             {
@@ -327,31 +307,10 @@ namespace IOT.AVREFWebWebsite.Business
         public bool LoadByNSNAndPartNumber(string strNSN, string strPartNum, string strTableName)
         {
             bool retVal = false;
-            string fsc = "", niin = "";
-
-            // StringBuilder sb = new StringBuilder();
-            // foreach (char cCurrent in strNSN)
-            // {
-            //     if (char.IsLetterOrDigit(cCurrent))
-            //     {
-            //         sb.Append(cCurrent);
-            //     }
-            // }
-            // strNSN = sb.ToString();
-
-            if (strNSN.Length > 4)
-            {
-                fsc = strNSN.Substring(0, 4);
-                niin = strNSN.Substring(4);
-            }
-            else
-                fsc = strNSN;
-
             IDbCommand Command = this.CreateCommand(string.Format(@"SELECT {0} 
                                                       FROM {1}                 
-                                                      WHERE MCRL.fsc=?FSC AND MCRL.niin=?NIIN AND MCRL.ref_numb=?PartNumber AND MCRL.tLastUpdt is not NULL", this.SelectFieldsWithUserPreferences(this.Username), busNSN.StandardFromClause));
-            Command.Parameters.Add(this.CreateParameter("?FSC", fsc));
-            Command.Parameters.Add(this.CreateParameter("?NIIN", niin));
+                                                      WHERE MCRL.nsn=?NSN AND MCRL.ref_numb=?PartNumber AND MCRL.tLastUpdt is not NULL", this.SelectFieldsWithUserPreferences(this.Username), busNSN.StandardFromClause));
+            Command.Parameters.Add(this.CreateParameter("?NSN", strNSN));
             Command.Parameters.Add(this.CreateParameter("?PartNumber", strPartNum));
 
             if (this.ExecuteWithErrorLog(Command, strTableName) < 1)
@@ -375,31 +334,10 @@ namespace IOT.AVREFWebWebsite.Business
         public bool LoadByNSNPartNumberAndCage(string strNSN, string strPartNum, string strCage, string strTableName)
         {
             bool retVal = false;
-            string fsc = "", niin = "";
-
-            // StringBuilder sb = new StringBuilder();
-            // foreach (char cCurrent in strNSN)
-            // {
-            //     if (char.IsLetterOrDigit(cCurrent))
-            //     {
-            //         sb.Append(cCurrent);
-            //     }
-            // }
-            // strNSN = sb.ToString();
-
-            if (strNSN.Length > 4)
-            {
-                fsc = strNSN.Substring(0, 4);
-                niin = strNSN.Substring(4);
-            }
-            else
-                fsc = strNSN;
-
             IDbCommand Command = this.CreateCommand(string.Format(@"SELECT {0} 
                                                       FROM {1}                 
-                                                      WHERE MCRL.fsc=?FSC AND MCRL.niin=?NIIN AND MCRL.ref_numb=?PartNumber AND MCRL.cage_cd_92=?Cage AND MCRL.tLastUpdt is not NULL", this.SelectFieldsWithUserPreferences(this.Username), busNSN.StandardFromClause));
-            Command.Parameters.Add(this.CreateParameter("?FSC", fsc));
-            Command.Parameters.Add(this.CreateParameter("?NIIN", niin));
+                                                      WHERE MCRL.nsn=?NSN AND MCRL.ref_numb=?PartNumber AND MCRL.cage_cd_92=?Cage AND MCRL.tLastUpdt is not NULL", this.SelectFieldsWithUserPreferences(this.Username), busNSN.StandardFromClause));
+            Command.Parameters.Add(this.CreateParameter("?NSN", strNSN));
             Command.Parameters.Add(this.CreateParameter("?PartNumber", strPartNum));
             Command.Parameters.Add(this.CreateParameter("?Cage", strCage));
 
@@ -423,41 +361,11 @@ namespace IOT.AVREFWebWebsite.Business
 
         public bool LoadByNSNAndCage(string strNSN, string strCage, string strTableName)
         {
-            // StringBuilder sb = new StringBuilder();
-            // foreach (char cCurrent in strNSN)
-            // {
-            //     if (char.IsLetterOrDigit(cCurrent))
-            //     {
-            //         sb.Append(cCurrent);
-            //     }
-            // }
-            // strNSN = sb.ToString();
-
-            // StringBuilder sb2 = new StringBuilder();
-            // foreach (char cCurrent in strCage)
-            // {
-            //     if (char.IsLetterOrDigit(cCurrent))
-            //     {
-            //         sb2.Append(cCurrent);
-            //     }
-            // }
-            // strCage = sb2.ToString();
-
             bool retVal = false;
-            string fsc = "", niin = "";
-            if (strNSN.Length > 4)
-            {
-                fsc = strNSN.Substring(0, 4);
-                niin = strNSN.Substring(4);
-            }
-            else
-                fsc = strNSN;
-
             IDbCommand Command = this.CreateCommand(string.Format(@"SELECT {0} 
                                                       FROM {1}                 
-                                                      WHERE MCRL.fsc=?FSC AND MCRL.niin=?NIIN AND MCRL.cage_cd_92=?Cage AND MCRL.tLastUpdt is not NULL", this.SelectFieldsWithUserPreferences(this.Username), busNSN.StandardFromClause));
-            Command.Parameters.Add(this.CreateParameter("?FSC", fsc));
-            Command.Parameters.Add(this.CreateParameter("?NIIN", niin));
+                                                      WHERE MCRL.nsn=?NSN AND MCRL.cage_cd_92=?Cage AND MCRL.tLastUpdt is not NULL", this.SelectFieldsWithUserPreferences(this.Username), busNSN.StandardFromClause));
+            Command.Parameters.Add(this.CreateParameter("?NSN", strNSN));
             Command.Parameters.Add(this.CreateParameter("?Cage", strCage));
 
             if (this.ExecuteWithErrorLog(Command, strTableName) < 1)
@@ -481,17 +389,6 @@ namespace IOT.AVREFWebWebsite.Business
         public bool LoadCHFByNSN(string strNSN, string strTableName)
         {
             bool retVal = false;
-
-            // StringBuilder sb = new StringBuilder();
-            // foreach (char cCurrent in strNSN)
-            // {
-            //     if (char.IsLetterOrDigit(cCurrent))
-            //     {
-            //         sb.Append(cCurrent);
-            //     }
-            // }
-            // strNSN = sb.ToString();
-
             IDbCommand Command = this.CreateCommand(string.Format(@"SELECT {0} 
                                                       FROM {1}                 
                                                       WHERE CHF.NSN=?NSN", this.SelectFieldsWithUserPreferences(this.Username, busNSN.EnumEnhancedSearchResultsType.CHF), busNSN.StandardCHFFromClause));
@@ -518,30 +415,10 @@ namespace IOT.AVREFWebWebsite.Business
         public bool LoadCHARByNSN(string strNSN, string strTableName)
         {
             bool retVal = false;
-            // StringBuilder sb = new StringBuilder();
-            // foreach (char cCurrent in strNSN)
-            // {
-            //     if (char.IsLetterOrDigit(cCurrent))
-            //     {
-            //         sb.Append(cCurrent);
-            //     }
-            // }
-            // strNSN = sb.ToString();
-
-            string fsc = "", niin = "";
-            if (strNSN.Length > 4)
-            {
-                fsc = strNSN.Substring(0, 4);
-                niin = strNSN.Substring(4);
-            }
-            else
-                fsc = strNSN;
-
             IDbCommand Command = this.CreateCommand(string.Format(@"SELECT {0} 
                                                       FROM {1}                 
-                                                      WHERE CHARGOV.fsc=?FSC AND CHARGOV.niin=?NIIN", this.SelectFieldsWithUserPreferences(this.Username, busNSN.EnumEnhancedSearchResultsType.CHAR), busNSN.StandardCHARFromClause));
-            Command.Parameters.Add(this.CreateParameter("?FSC", fsc));
-            Command.Parameters.Add(this.CreateParameter("?NIIN", niin));
+                                                      WHERE CHARGOV.nsn=?NSN", this.SelectFieldsWithUserPreferences(this.Username, busNSN.EnumEnhancedSearchResultsType.CHAR), busNSN.StandardCHARFromClause));
+            Command.Parameters.Add(this.CreateParameter("?NSN", strNSN));
 
             if (this.ExecuteWithErrorLog(Command, strTableName) < 1)
             {
@@ -780,7 +657,7 @@ namespace IOT.AVREFWebWebsite.Business
                                                                  WHERE {2}
                                                                  LIMIT {3}",
                                                                  $"{busNSN.StandardMDISFieldList}, {codeFields}",
-                                                                 $"{busNSN.StandardMDISFromClause} LEFT JOIN NsnExportCodes ON NsnExportCodes.P_NSN = CONCAT(MDIS.fsc, MDIS.NIIN)",
+                                                                 $"{busNSN.StandardMDISFromClause} LEFT JOIN NsnExportCodes ON NsnExportCodes.P_NSN = MDIS.nsn",
                                                                  whereClause,
                                                                  this.FetchSize.ToString()));
 
@@ -790,26 +667,27 @@ namespace IOT.AVREFWebWebsite.Business
                     if (this.ExecuteWithErrorLog(Command, this.Tablename) < 1)
                     {
                         //CharGov Table Where Clause
-                        this.eEnhancedSearchResultsType = EnumEnhancedSearchResultsType.CHAR;
-                        fieldExpression = "CharGov.nsn";
+                        // this.eEnhancedSearchResultsType = EnumEnhancedSearchResultsType.CHAR;
+                        // fieldExpression = "CharGov.nsn";
 
-                        whereClause = string.Format("{0} {1} ?valueToFind", fieldExpression, comparisonOperator);
+                        // whereClause = string.Format("{0} {1} ?valueToFind", fieldExpression, comparisonOperator);
 
-                        Command = this.CreateCommand(string.Format(@"SELECT {0}
-                                                                     FROM {1}
-                                                                     WHERE {2}
-                                                                     LIMIT {3}",
-                                                                     $"{busNSN.StandardCHARFieldList}, {codeFields}",
-                                                                     $"{busNSN.StandardCHARFromClause} LEFT JOIN NsnExportCodes ON NsnExportCodes.P_NSN = CONCAT(CharGov.fsc, CharGov.NIIN)",
-                                                                     whereClause,
-                                                                     this.FetchSize.ToString()));
+                        // Command = this.CreateCommand(string.Format(@"SELECT {0}
+                        //                                              FROM {1}
+                        //                                              WHERE {2}
+                        //                                              LIMIT {3}",
+                        //                                              $"{busNSN.StandardCHARFieldList}, {codeFields}",
+                        //                                              $"{busNSN.StandardCHARFromClause} LEFT JOIN NsnExportCodes ON NsnExportCodes.P_NSN = CharGov.nsn",
+                        //                                              whereClause,
+                        //                                              this.FetchSize.ToString()));
 
-                        Command.Parameters.Add(this.CreateParameter("?valueToFind", valueToFind));
+                        // Command.Parameters.Add(this.CreateParameter("?valueToFind", valueToFind));
 
-                        Command.Prepare();
+                        // Command.Prepare();
 
-                        if (this.ExecuteWithErrorLog(Command, this.Tablename) < 1)
-                        {
+                        // if (this.ExecuteWithErrorLog(Command, this.Tablename) < 1)
+                        // {
+                            
                             //CHF Table Where Clause
                             this.eEnhancedSearchResultsType = EnumEnhancedSearchResultsType.CHF;
                             fieldExpression = "CHF.NSN";
@@ -841,13 +719,13 @@ namespace IOT.AVREFWebWebsite.Business
                                 this.DataRow = this.DataSet.Tables[this.Tablename].Rows[0];
                                 return true;
                             }
-                        }
-                        else
-                        {
-                            this.SetError(busNSN.CHARInformationMessage);
-                            this.DataRow = this.DataSet.Tables[this.Tablename].Rows[0];
-                            return true;
-                        }
+                        // }
+                        // else
+                        // {
+                        //     this.SetError(busNSN.CHARInformationMessage);
+                        //     this.DataRow = this.DataSet.Tables[this.Tablename].Rows[0];
+                        //     return true;
+                        // }
                     }
                     else
                     {
@@ -870,8 +748,8 @@ namespace IOT.AVREFWebWebsite.Business
                         //strNSNPartResults += String.Format("'{0}',",drResult["NSN"].ToString());
                         if (!strOriginalResultsOrder.Contains(String.Format("{0},", drResult["iPrimary"].ToString())))
                             strOriginalResultsOrder += String.Format("{0},", drResult["iPrimary"].ToString());
-                        if (!strNSNPartResults.Contains(String.Format("(MCRL.fsc = '{0}' AND MCRL.NIIN = '{1}') OR", drResult["NSN"].ToString().Substring(0, 4), drResult["NSN"].ToString().Substring(4))))
-                            strNSNPartResults += String.Format("(MCRL.fsc = '{0}' AND MCRL.NIIN = '{1}') OR", drResult["NSN"].ToString().Substring(0, 4), drResult["NSN"].ToString().Substring(4));
+                        if (!strNSNPartResults.Contains(String.Format("(MCRL.nsn = '{0}') OR", drResult["NSN"].ToString())))
+                            strNSNPartResults += String.Format("(MCRL.nsn = '{0}') OR", drResult["NSN"].ToString());
                     }
 
                     strOriginalResultsOrder = strOriginalResultsOrder.Substring(0, strOriginalResultsOrder.Length - 1);
